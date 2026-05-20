@@ -86,10 +86,18 @@ html, body {
 }
 
 .flag {
-  width: 72px;
-  height: 72px;
+  width: 96px;
+  height: 64px;
+  object-fit: cover;
   display: block;
   margin: 0 auto 8px auto;
+}
+
+/* FLAG 1 ONLY = SQUARE */
+.column:first-child .item:first-child .flag {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
 }
 
 .title { font-size: 18px; }
@@ -110,13 +118,14 @@ html, body {
 
   color: white;
   cursor: pointer;
-  z-index: 999;
+  z-index: 10000;
 
   backdrop-filter: blur(6px);
   transition: 0.25s ease;
   font-size: 14px;
 }
 
+/* ✅ RESTORED GLOW EFFECT */
 .controlBtn:hover {
   transform: scale(1.05);
   box-shadow: 0 0 16px rgba(255,255,255,0.25);
@@ -125,40 +134,10 @@ html, body {
 #fsBtn { top: 18px; right: 18px; }
 #muteBtn { bottom: 18px; right: 18px; }
 #bgBtn { bottom: 18px; left: 18px; }
+#ssBtn { top: 18px; left: 18px; }
+#ssReturnBtn { top: 18px; left: 18px; }
 
 .hidden { display: none !important; }
-
-/* MODAL */
-#modal {
-  position: fixed;
-  inset: 0;
-  background: black;
-  display: none;
-  z-index: 500;
-}
-
-#modal.active {
-  display: block;
-}
-
-#modal video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-#closeModal {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: white;
-  cursor: pointer;
-  z-index: 600;
-}
 
 /* SCREENSAVER */
 #screensaver {
@@ -191,26 +170,32 @@ html, body {
 
 <!-- SCREENSAVER -->
 <video id="screensaver" muted loop playsinline>
-  <source src="sreensaver.mp4">
+  <source src="screensaver.mp4">
 </video>
 
 <!-- ENTER -->
 <div id="enterScreen">CLICK TO ENTER</div>
 
 <!-- CONTROLS -->
-<div id="fsBtn" class="controlBtn">
-  <span class="icon">⛶</span>
-  <span class="label">Fullscreen</span>
+<div id="fsBtn" class="controlBtn hidden">
+  <span>⛶</span><span>Fullscreen</span>
 </div>
 
-<div id="muteBtn" class="controlBtn">
-  <span class="icon">🔇</span>
-  <span class="label">Mute</span>
+<div id="muteBtn" class="controlBtn hidden">
+  <span>🔇</span><span>Mute</span>
 </div>
 
-<div id="bgBtn" class="controlBtn">
-  <span class="icon">🎬</span>
-  <span class="label">Background Video</span>
+<!-- ✅ BACKGROUND VIDEO BUTTON RESTORED -->
+<div id="bgBtn" class="controlBtn hidden">
+  <span>🎬</span><span>Background Video</span>
+</div>
+
+<div id="ssBtn" class="controlBtn hidden">
+  <span>⏳</span><span>Screensaver</span>
+</div>
+
+<div id="ssReturnBtn" class="controlBtn hidden">
+  <span>←</span><span>Return</span>
 </div>
 
 <!-- MENU -->
@@ -270,12 +255,6 @@ html, body {
 
 </div>
 
-<!-- MODAL -->
-<div id="modal">
-  <div id="closeModal">← Return</div>
-  <video id="modalVideo" controls></video>
-</div>
-
 <script>
 
 const enter = document.getElementById("enterScreen");
@@ -286,17 +265,21 @@ const insertVideo = document.getElementById("insertVideo");
 const introVideo = document.getElementById("introVideo");
 const screensaver = document.getElementById("screensaver");
 
-const modal = document.getElementById("modal");
-const modalVideo = document.getElementById("modalVideo");
-
 const fsBtn = document.getElementById("fsBtn");
+const muteBtn = document.getElementById("muteBtn");
+const bgBtn = document.getElementById("bgBtn");
+const ssBtn = document.getElementById("ssBtn");
+const ssReturnBtn = document.getElementById("ssReturnBtn");
 
 let muted = true;
-let idle = 0;
 
 /* ENTER FLOW */
 enter.onclick = async () => {
+
   enter.style.display = "none";
+
+  fsBtn.classList.remove("hidden");
+  muteBtn.classList.remove("hidden");
 
   bgVideo.pause();
 
@@ -315,39 +298,60 @@ enter.onclick = async () => {
       introVideo.style.display = "none";
       bgVideo.play().catch(()=>{});
       overlay.classList.add("active");
+
+      ssBtn.classList.remove("hidden");
+      bgBtn.classList.remove("hidden"); // restored
     };
   };
 };
 
-/* FULLSCREEN + AUTO HIDE BUTTON */
+/* FULLSCREEN */
 fsBtn.onclick = () => {
   document.documentElement.requestFullscreen();
 };
 
-document.addEventListener("fullscreenchange", () => {
-  if (document.fullscreenElement) {
-    fsBtn.classList.add("hidden");
-  } else {
-    fsBtn.classList.remove("hidden");
-  }
-});
-
 /* MUTE */
-document.getElementById("muteBtn").onclick = () => {
+muteBtn.onclick = () => {
   muted = !muted;
   document.querySelectorAll("video").forEach(v => v.muted = muted);
 
-  const btn = document.getElementById("muteBtn");
-  btn.querySelector(".icon").textContent = muted ? "🔇" : "🔊";
-  btn.querySelector(".label").textContent = muted ? "Mute" : "Unmute";
+  const icon = muteBtn.querySelector("span");
+  const label = muteBtn.querySelectorAll("span")[1];
+
+  icon.textContent = muted ? "🔇" : "🔊";
+  label.textContent = muted ? "Unmute" : "Mute";
 };
 
-/* BACKGROUND BUTTON */
-document.getElementById("bgBtn").onclick = () => {
+/* BACKGROUND VIDEO */
+bgBtn.onclick = () => {
   window.open("https://myclaridenschool-my.sharepoint.com/:v:/g/personal/msimmons_claridenschool_org/IQABc_9a6swjSLiHrvNS6q3YAYCnu3uNvkPqHfJO0VcRbf4?e=eJ5B0Q", "_blank");
 };
 
-/* REGION PLAYBACK */
+/* SCREENSAVER */
+function showScreensaver() {
+  overlay.classList.remove("active");
+  ssBtn.classList.add("hidden");
+
+  screensaver.style.display = "block";
+  screensaver.play().catch(()=>{});
+
+  ssReturnBtn.classList.remove("hidden");
+}
+
+function hideScreensaver() {
+  screensaver.pause();
+  screensaver.style.display = "none";
+
+  overlay.classList.add("active");
+
+  ssBtn.classList.remove("hidden");
+  ssReturnBtn.classList.add("hidden");
+}
+
+ssBtn.onclick = showScreensaver;
+ssReturnBtn.onclick = hideScreensaver;
+
+/* REGION LINKS */
 function openVideo(region) {
 
   const map = {
@@ -362,26 +366,6 @@ function openVideo(region) {
 
   window.open(map[region], "_blank");
 }
-
-/* CLOSE MODAL */
-document.getElementById("closeModal").onclick = () => {
-  modal.classList.remove("active");
-  modalVideo.pause();
-  modalVideo.src = "";
-};
-
-/* SCREENSAVER */
-setInterval(() => {
-  idle++;
-  if (idle >= 180) {
-    screensaver.style.display = "block";
-    screensaver.play().catch(()=>{});
-  }
-}, 1000);
-
-document.onmousemove = () => idle = 0;
-document.onkeydown = () => idle = 0;
-document.onclick = () => idle = 0;
 
 </script>
 
