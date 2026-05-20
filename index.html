@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Europe 2026 DVD</title>
+
+<style>
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: black;
+  font-family: Arial, sans-serif;
+}
+
+/* BACKGROUND */
+#bgVideo {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* DVD SEQUENCE */
+#insertVideo, #introVideo {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 50;
+  display: none;
+}
+
+/* ENTER SCREEN */
+#enterScreen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+  color: white;
+  font-size: 28px;
+  z-index: 100;
+  cursor: pointer;
+}
+
+/* MENU */
+#overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60px;
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+  transition: 1s ease;
+  z-index: 10;
+}
+
+#overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.item {
+  text-align: center;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.item:hover {
+  transform: scale(1.08);
+}
+
+.flag {
+  width: 72px;
+  height: 72px;
+  display: block;
+  margin: 0 auto 8px auto;
+}
+
+.title { font-size: 18px; }
+.subtext { font-size: 12px; opacity: 0.6; }
+
+/* CONTROLS */
+.controlBtn {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 14px;
+  border-radius: 999px;
+
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.25);
+
+  color: white;
+  cursor: pointer;
+  z-index: 999;
+
+  backdrop-filter: blur(6px);
+  transition: 0.25s ease;
+  font-size: 14px;
+}
+
+.controlBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 16px rgba(255,255,255,0.25);
+}
+
+#fsBtn { top: 18px; right: 18px; }
+#muteBtn { bottom: 18px; right: 18px; }
+#bgBtn { bottom: 18px; left: 18px; }
+
+.hidden { display: none !important; }
+
+/* MODAL */
+#modal {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: none;
+  z-index: 500;
+}
+
+#modal.active {
+  display: block;
+}
+
+#modal video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+#closeModal {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  cursor: pointer;
+  z-index: 600;
+}
+
+/* SCREENSAVER */
+#screensaver {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+  z-index: 9999;
+}
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND -->
+<video id="bgVideo" autoplay loop muted playsinline>
+  <source src="background.mp4">
+</video>
+
+<!-- DVD -->
+<video id="insertVideo" muted playsinline>
+  <source src="insert.mp4">
+</video>
+
+<video id="introVideo" muted playsinline>
+  <source src="intro.mp4">
+</video>
+
+<!-- SCREENSAVER -->
+<video id="screensaver" muted loop playsinline>
+  <source src="sreensaver.mp4">
+</video>
+
+<!-- ENTER -->
+<div id="enterScreen">CLICK TO ENTER</div>
+
+<!-- CONTROLS -->
+<div id="fsBtn" class="controlBtn">
+  <span class="icon">⛶</span>
+  <span class="label">Fullscreen</span>
+</div>
+
+<div id="muteBtn" class="controlBtn">
+  <span class="icon">🔇</span>
+  <span class="label">Mute</span>
+</div>
+
+<div id="bgBtn" class="controlBtn">
+  <span class="icon">🎬</span>
+  <span class="label">Background Video</span>
+</div>
+
+<!-- MENU -->
+<div id="overlay">
+
+  <div class="column">
+    <div class="item" onclick="openVideo('region1')">
+      <img class="flag" src="flags/flag1.svg">
+      <div class="title">Switzerland</div>
+      <div class="subtext">Bennett Galich & Star Knight</div>
+    </div>
+
+    <div class="item" onclick="openVideo('region2')">
+      <img class="flag" src="flags/flag2.svg">
+      <div class="title">Lake Como</div>
+      <div class="subtext">Devyn Taft & Amar Walia</div>
+    </div>
+
+    <div class="item" onclick="openVideo('region3')">
+      <img class="flag" src="flags/flag3.svg">
+      <div class="title">Cinque Terre</div>
+      <div class="subtext">Noah Elborai</div>
+    </div>
+
+    <div class="item" onclick="openVideo('region4')">
+      <img class="flag" src="flags/flag4.svg">
+      <div class="title">Monaco</div>
+      <div class="subtext">Avi Dev & Nick Schutts</div>
+    </div>
+  </div>
+
+  <div class="column">
+    <div class="item" onclick="openVideo('region5')">
+      <img class="flag" src="flags/flag5.svg">
+      <div class="title">Nice</div>
+      <div class="subtext">Natalia Moore</div>
+    </div>
+
+    <div class="item" onclick="openVideo('region6')">
+      <img class="flag" src="flags/flag6.svg">
+      <div class="title">Nîmes</div>
+      <div class="subtext">Leo Tran</div>
+    </div>
+
+    <div class="item" onclick="openVideo('region7')">
+      <img class="flag" src="flags/flag7.svg">
+      <div class="title">Provence</div>
+      <div class="subtext">Morgan & Ava</div>
+    </div>
+
+    <div class="item" onclick="openVideo('region8')">
+      <img class="flag" src="flags/flag8.svg">
+      <div class="title">Spain</div>
+      <div class="subtext">Keira Haley</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal">
+  <div id="closeModal">← Return</div>
+  <video id="modalVideo" controls></video>
+</div>
+
+<script>
+
+const enter = document.getElementById("enterScreen");
+const overlay = document.getElementById("overlay");
+
+const bgVideo = document.getElementById("bgVideo");
+const insertVideo = document.getElementById("insertVideo");
+const introVideo = document.getElementById("introVideo");
+const screensaver = document.getElementById("screensaver");
+
+const modal = document.getElementById("modal");
+const modalVideo = document.getElementById("modalVideo");
+
+const fsBtn = document.getElementById("fsBtn");
+
+let muted = true;
+let idle = 0;
+
+/* ENTER FLOW */
+enter.onclick = async () => {
+  enter.style.display = "none";
+
+  bgVideo.pause();
+
+  insertVideo.style.display = "block";
+  await insertVideo.play().catch(()=>{});
+
+  insertVideo.onended = async () => {
+    insertVideo.style.display = "none";
+
+    introVideo.style.display = "block";
+    introVideo.volume = 0.5;
+
+    await introVideo.play().catch(()=>{});
+
+    introVideo.onended = () => {
+      introVideo.style.display = "none";
+      bgVideo.play().catch(()=>{});
+      overlay.classList.add("active");
+    };
+  };
+};
+
+/* FULLSCREEN + AUTO HIDE BUTTON */
+fsBtn.onclick = () => {
+  document.documentElement.requestFullscreen();
+};
+
+document.addEventListener("fullscreenchange", () => {
+  if (document.fullscreenElement) {
+    fsBtn.classList.add("hidden");
+  } else {
+    fsBtn.classList.remove("hidden");
+  }
+});
+
+/* MUTE */
+document.getElementById("muteBtn").onclick = () => {
+  muted = !muted;
+  document.querySelectorAll("video").forEach(v => v.muted = muted);
+
+  const btn = document.getElementById("muteBtn");
+  btn.querySelector(".icon").textContent = muted ? "🔇" : "🔊";
+  btn.querySelector(".label").textContent = muted ? "Mute" : "Unmute";
+};
+
+/* BACKGROUND BUTTON */
+document.getElementById("bgBtn").onclick = () => {
+  window.open("https://myclaridenschool-my.sharepoint.com/:v:/g/personal/msimmons_claridenschool_org/IQABc_9a6swjSLiHrvNS6q3YAYCnu3uNvkPqHfJO0VcRbf4?e=eJ5B0Q", "_blank");
+};
+
+/* REGION PLAYBACK */
+function openVideo(region) {
+
+  const map = {
+    region1: "https://myclaridenschool-my.sharepoint.com/:v:/g/personal/msimmons_claridenschool_org/IQD2oZtFsnCpRpUQI9NrXB4SAXS-aOgNHXms45xfh-vpiCo?e=IVLidS",
+    region2: "https://myclaridenschool-my.sharepoint.com/:v:/g/personal/msimmons_claridenschool_org/IQCidpL-qbbBR73eRpdW6JJnAZwW0aqEiytrGoNkhQVzfNo?e=ySv0fS",
+    region3: "https://myclaridenschool-my.sharepoint.com/:v:/g/personal/msimmons_claridenschool_org/IQBN9LQnMaWJQbv5DCpT28ZcAacuDlosPxRSc7_3ao9LEZA?e=Bm18ha",
+    region4: "https://myclaridenschool-my.sharepoint.com/:v:/g/personal/msimmons_claridenschool_org/IQAZbKEu3R74R470gSr5IQpzAWz7YhvCuaCQ9qqZiwwLP2c?e=Yp0vpx",
+    region5: "https://myclaridenschool-my.sharepoint.com/:v:/g/personal/msimmons_claridenschool_org/IQACAs-q4pfjT4IcuWTy9KVtAT6_GVHSGX182kWQ3PsaytE?e=Ym17O1",
+    region7: "https://myclaridenschool-my.sharepoint.com/:v:/g/personal/msimmons_claridenschool_org/IQDE6_ViXk3FQakr0sZseee8AXFd0ECVPQmqHrDFJVX-biE?e=oGxftb",
+    region8: "https://myclaridenschool-my.sharepoint.com/:v:/g/personal/msimmons_claridenschool_org/IQBduSsoEteLQatjUusn-CxBAd2u1oBZd-myPrhI1CdJtKs?e=f1cDvK"
+  };
+
+  window.open(map[region], "_blank");
+}
+
+/* CLOSE MODAL */
+document.getElementById("closeModal").onclick = () => {
+  modal.classList.remove("active");
+  modalVideo.pause();
+  modalVideo.src = "";
+};
+
+/* SCREENSAVER */
+setInterval(() => {
+  idle++;
+  if (idle >= 180) {
+    screensaver.style.display = "block";
+    screensaver.play().catch(()=>{});
+  }
+}, 1000);
+
+document.onmousemove = () => idle = 0;
+document.onkeydown = () => idle = 0;
+document.onclick = () => idle = 0;
+
+</script>
+
+</body>
+</html>
